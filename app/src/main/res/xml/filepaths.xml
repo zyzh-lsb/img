@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <external-path path="Android/data/hnkf.com.zy.zh.zyzh/"        name="files_root" />
+    <external-path
+        name="external_files"
+        path="."/>
+    <external-path
+        name="rc_external_path"
+        path="." />
+    <root-path
+        name="rc_root_path"
+        path="" />
+</resources>
