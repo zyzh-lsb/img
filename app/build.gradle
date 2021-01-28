@@ -39,6 +39,5 @@ dependencies {
     // 引入基础SDK
     implementation 'com.huawei.hms:ml-computer-vision:1.0.2.300'
 
-    implementation 'com.novoda:bintray-release:0.2.7'
 
 }
