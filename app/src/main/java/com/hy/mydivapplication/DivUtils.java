@@ -34,9 +34,8 @@ public class DivUtils {
     public static final int REQUESTCODE_PHOTO=901;
     public static final int REQUESTCODE_IMG=902;
     public static Uri imageUri;//相机拍照图片保存地址
-
+    public static  File outputImage;
     public static void showDIV(Bitmap bitmap, ImageView iv_show, int color,File file) {
-        Log.e("Div", "Bitmap:"+(bitmap==null));
         // 方式一：使用默认参数配置图像分割检测器。
 // 默认模式为：人像分割模式 + 精度模式，返回人像分割的所有分割结果（像素级标记信息、背景透明的人像图、人像为白色，背景为黑色的灰度图以及被分割的原图）。
 //        MLImageSegmentationAnalyzer analyzer = MLAnalyzerFactory.getInstance().getImageSegmentationAnalyzer();
@@ -53,34 +52,30 @@ public class DivUtils {
                 // MLImageSegmentationScene.GRAYSCALE_ONLY: 只返回人像为白色，背景为黑色的灰度图。
 //                .setScene(MLImageSegmentationScene.FOREGROUND_ONLY)
                 .create();
-        Log.e("Div", "初始化成功");
         MLImageSegmentationAnalyzer analyzer = MLAnalyzerFactory.getInstance().getImageSegmentationAnalyzer(setting);
         // 通过bitmap创建MLFrame，bitmap为输入的Bitmap格式图片数据。
         MLFrame frame = MLFrame.fromBitmap(bitmap);
-        Log.e("Div", "创建MLFrame成功");
         // 创建一个task，处理图像分割检测器返回的结果。
         Task<MLImageSegmentation> task = analyzer.asyncAnalyseFrame(frame);
-        Log.e("Div", "创建图像分割检测器成功");
 // 异步处理图像分割检测器返回结果。
         task.addOnSuccessListener(segmentation -> {
             Log.e("Div返回", "foreground:"+(segmentation.foreground==null)+"___grayscale:"+(segmentation.grayscale==null)+"___masks:"+(segmentation.masks.toString()));
-
-
             iv_show.setBackgroundColor(color);
             iv_show.setImageBitmap(segmentation.foreground);
             iv_show.setDrawingCacheEnabled(true);
-            Log.e("Div", String.valueOf(iv_show.getDrawingCache()==null));
             Bitmap bitmap1 = Bitmap.createBitmap(iv_show.getDrawingCache());
             saveBitmap(bitmap1,file);
             iv_show.setDrawingCacheEnabled(false);
             iv_show.destroyDrawingCache();
-            if (analyzer != null) {
-                try {
-                    analyzer.stop();
-                } catch (IOException e) {
-                    Log.e("Div异常", e.toString());
-                    // 异常处理。
-                }
+            if (outputImage!=null){
+                deleteFile(outputImage);
+            }
+
+            try {
+                analyzer.stop();
+            } catch (IOException e) {
+                Log.e("Div异常", e.toString());
+                // 异常处理。
             }
             // 检测成功处理。
         })
@@ -130,7 +125,7 @@ public class DivUtils {
      */
     public static void openCamera(Activity activity) {
         // 创建File对象，用于存储拍照后的图片
-        File outputImage = new File(activity.getExternalCacheDir(), "div_image.jpg");
+         outputImage = new File(activity.getExternalCacheDir(), "div_image.jpg");
 
         try {
             if (outputImage.exists()) {
